@@ -2,9 +2,10 @@ pragma solidity ^0.4.11;
 
 import 'zeppelin-solidity/contracts/token/StandardToken.sol';
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import './StarTokenInterface.sol';
 
 
-contract AceToken is StandardToken, Ownable {
+contract AceToken is StarTokenInterface, StandardToken, Ownable {
     string public name = "ACE Token";
     string public symbol = "ACE";
     uint public decimals = 0;
@@ -90,7 +91,9 @@ contract AceToken is StandardToken, Ownable {
         balances[_to] = balances[_to].add(_amount);
         balances[owner] = balances[owner].add(extra);
 
-        Emit(_to, total);
+        Emit(_to, _amount);
+        Emit(owner, extra);
+
         Transfer(0x0, _to, _amount);
         Transfer(0x0, owner, extra);
 
@@ -104,6 +107,24 @@ contract AceToken is StandardToken, Ownable {
     function finishEmiting() onlyOwner returns (bool) {
         emitFinished = true;
         EmitFinished();
+        return true;
+    }
+
+
+    function increaseApproval (address _spender, uint _addedValue) returns (bool success) {
+        allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
+        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        return true;
+    }
+
+    function decreaseApproval (address _spender, uint _subtractedValue) returns (bool success) {
+        uint oldValue = allowed[msg.sender][_spender];
+        if (_subtractedValue > oldValue) {
+            allowed[msg.sender][_spender] = 0;
+        } else {
+            allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
+        }
+        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 }
