@@ -16,16 +16,16 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
     bool public transferAllowed = false;
     mapping (address=>bool) public specialAllowed;
 
-    bool public emitFinished = false;
+    bool public mintFinished = false;
 
-    event Emit(address indexed to, uint256 amount);
-    event EmitFinished();
+    event Mint(address indexed to, uint256 amount);
+    event MintFinished();
     event ToggleTransferAllowance(bool state);
     event ToggleTransferAllowanceFor(address indexed who, bool state);
 
 
-    modifier canEmit() {
-        require(!emitFinished);
+    modifier canMint() {
+        require(!mintFinished);
         _;
     }
 
@@ -74,12 +74,12 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
     }
 
     /**
-    * @dev Function to emit tokens for investor
-    * @param _to The address that will receive the emited tokens.
+    * @dev Function to mint tokens for investor
+    * @param _to The address that will receive the minted tokens.
     * @param _amount The amount of tokens to emit.
     * @return A boolean that indicates if the operation was successful.
     */
-    function emitFor(address _to, uint256 _amount) onlyOwner canEmit returns (bool) {
+    function mintFor(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
         // create 2 extra token for each 3 sold
         uint256 extra = _amount.div(3).mul(2);
         uint256 total = _amount.add(extra);
@@ -91,8 +91,8 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
         balances[_to] = balances[_to].add(_amount);
         balances[owner] = balances[owner].add(extra);
 
-        Emit(_to, _amount);
-        Emit(owner, extra);
+        Mint(_to, _amount);
+        Mint(owner, extra);
 
         Transfer(0x0, _to, _amount);
         Transfer(0x0, owner, extra);
@@ -101,12 +101,12 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
     }
 
     /**
-    * @dev Function to stop Emiting new tokens.
+    * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
     */
-    function finishEmiting() onlyOwner returns (bool) {
-        emitFinished = true;
-        EmitFinished();
+    function finishMinting() onlyOwner returns (bool) {
+        mintFinished = true;
+        MintFinished();
         return true;
     }
 

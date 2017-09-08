@@ -14,12 +14,12 @@ contract StarTokenInterface {
     function toggleTransfer() returns (bool);
     function toggleTransferFor(address _for) returns (bool);
     
-    function emitFor(address _to, uint256 _amount) returns (bool);
+    function mintFor(address _to, uint256 _amount) returns (bool);
     function finishEmiting() returns (bool);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    event Emit(address indexed to, uint256 amount);
-    event EmitFinished();
+    event Mint(address indexed to, uint256 amount);
+    event MintFinished();
     event ToggleTransferAllowance(bool state);
     event ToggleTransferAllowanceFor(address indexed who, bool state);
 
