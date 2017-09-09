@@ -40,23 +40,23 @@ contract('AceToken', accounts => {
         })
 
         it('should create extra 2 tokens for each 3 tokens', async() => {
-            await ACE.emitFor(accounts[1], 3, OWNER_SIGNATURE)
+            await ACE.mintFor(accounts[1], 3, OWNER_SIGNATURE)
             await assertSupply(3+2) // 3 token allocated for account1 and few extra for a team and bounty
         })
 
         it('should create extra tokens only for each 3 tokens', async() => {
-            await ACE.emitFor(accounts[1], 7, OWNER_SIGNATURE)
+            await ACE.mintFor(accounts[1], 7, OWNER_SIGNATURE)
             await assertSupply(7+4)
         })
 
         it('should allocate huge amount', async() => {
-            await ACE.emitFor(accounts[2], 60000000, OWNER_SIGNATURE)
+            await ACE.mintFor(accounts[2], 60000000, OWNER_SIGNATURE)
             await assertSupply(100000000)
         })
 
-        it('prevent to emit more than hard cap', async() => {
-            await ACE.emitFor(accounts[3], await ACE.MAXSOLD_SUPPLY(), OWNER_SIGNATURE)
-            await expectThrow(ACE.emitFor(accounts[2], 3, OWNER_SIGNATURE))
+        it('prevent to mint more than hard cap', async() => {
+            await ACE.mintFor(accounts[3], await ACE.MAXSOLD_SUPPLY(), OWNER_SIGNATURE)
+            await expectThrow(ACE.mintFor(accounts[2], 3, OWNER_SIGNATURE))
             await assertSupply(await ACE.HARDCAPPED_SUPPLY())
         })
     })
@@ -68,8 +68,8 @@ contract('AceToken', accounts => {
         }
 
         beforeEach(async() => {
-            await ACE.emitFor(accounts[1], 10000, OWNER_SIGNATURE)
-            await ACE.emitFor(accounts[2],  2000, OWNER_SIGNATURE)
+            await ACE.mintFor(accounts[1], 10000, OWNER_SIGNATURE)
+            await ACE.mintFor(accounts[2],  2000, OWNER_SIGNATURE)
 
             await assertBalance(accounts[1], 10000)
             await assertBalance(accounts[2], 2000)

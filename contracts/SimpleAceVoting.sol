@@ -6,33 +6,20 @@ import './StarTokenInterface.sol';
 
 contract SimpleAceVoting {
     using SafeMath for uint256;
-    StarTokenInterface public baseToken;
 
-    mapping(address => uint256) allowed;
+    address public tokenAddress;
     mapping(address => uint256) voted;
 
-    modifier haveAllowed() {
-      require(allowed[msg.sender] > 0);
-      _;
-    }
-
     function SimpleAceVoting(address token) {
-        baseToken = StarTokenInterface(token);
+        tokenAddress = token;
     }
 
-    function refreshAllowed() returns (bool) {
-        uint allow = baseToken.allowance(msg.sender, this);
-        require(baseToken.transferFrom(msg.sender, this, allow));
-        allowed[msg.sender] = allow;
-        return true;
-    }
+    function voteFor(address _pretendent, uint256 _amount) returns (bool) {
+        StarTokenInterface aceToken = StarTokenInterface(tokenAddress);
+        require(_pretendent != 0x0);
+        require(aceToken.allowance(msg.sender, this) >= _amount);
+        require(aceToken.transferFrom(msg.sender, this, _amount));
 
-    function voteFor(address _pretedent, uint256 _amount) haveAllowed returns (bool) {
-      require(allowed[msg.sender] >= _amount);
-
-      voted[_pretedent] = voted[_pretedent].add(_amount);
-      allowed[msg.sender] = allowed[msg.sender].sub(_amount);
-      
-      return true;
+        voted[_pretendent] = voted[_pretendent].add(_amount);
     }
 }

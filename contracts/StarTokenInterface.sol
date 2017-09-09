@@ -15,7 +15,7 @@ contract StarTokenInterface {
     function toggleTransferFor(address _for) returns (bool);
     
     function mintFor(address _to, uint256 _amount) returns (bool);
-    function finishEmiting() returns (bool);
+    function finishMinting() returns (bool);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Mint(address indexed to, uint256 amount);
