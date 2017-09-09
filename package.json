@@ -1,0 +1,30 @@
+{
+  "name": "ace-token",
+  "version": "1.0.0",
+  "description": "Implementation of Mintable ERC20 token based on Ethereum protocol",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "sol-merger": "0.0.2",
+    "zeppelin-solidity": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "merge": "sol-merger ./contracts/AceToken.sol ./build/contracts/AceToken.sol"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://alerdenisov@bitbucket.org/alerdenisov/acetoken.git"
+  },
+  "keywords": [
+    "ethereum",
+    "eth",
+    "solidity",
+    "token",
+    "erc20"
+  ],
+  "author": "Aler Denisov <aler.zampillo@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/alerdenisov/acetoken#readme"
+}

@@ -1,33 +1,27 @@
 pragma solidity ^0.4.11;
 
-import 'zeppelin-solidity/contracts/token/StandardToken.sol';
-import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import './StarTokenInterface.sol';
 
 
-contract AceToken is StarTokenInterface, StandardToken, Ownable {
-    string public name = "ACE Token";
-    string public symbol = "ACE";
-    uint public decimals = 0;
+contract AceToken is StarTokenInterface {
+    using SafeMath for uint;
+    using SafeMath for uint256;
+    
+    // ERC20 constants
+    string public constant name = "ACE Token";
+    string public constant symbol = "ACE";
+    uint public constant decimals = 0;
 
-    uint256 public MAXSOLD_SUPPLY = 99000000;
-    uint256 public HARDCAPPED_SUPPLY = 165000000;
+    // Minting constants
+    uint256 public constant MAXSOLD_SUPPLY = 99000000;
+    uint256 public constant HARDCAPPED_SUPPLY = 165000000;
     
     bool public transferAllowed = false;
     mapping (address=>bool) public specialAllowed;
 
-    bool public mintFinished = false;
-
-    event Mint(address indexed to, uint256 amount);
-    event MintFinished();
     event ToggleTransferAllowance(bool state);
     event ToggleTransferAllowanceFor(address indexed who, bool state);
-
-
-    modifier canMint() {
-        require(!mintFinished);
-        _;
-    }
 
     modifier allowTransfer() {
         require(transferAllowed || specialAllowed[msg.sender]);
@@ -70,7 +64,7 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
     function toggleTransferFor(address _for) onlyOwner returns (bool) {
         specialAllowed[_for] = !specialAllowed[_for];
         ToggleTransferAllowanceFor(_for, specialAllowed[_for]);
-        return true;
+        return specialAllowed[_for];
     }
 
     /**
@@ -79,15 +73,18 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
     * @param _amount The amount of tokens to emit.
     * @return A boolean that indicates if the operation was successful.
     */
-    function mintFor(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
+    function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
+        require(_amount > 0);
+        
         // create 2 extra token for each 3 sold
         uint256 extra = _amount.div(3).mul(2);
         uint256 total = _amount.add(extra);
 
-        // Prevent to emit more than handcap!
-        assert(totalSupply.add(total) <= HARDCAPPED_SUPPLY);
-
         totalSupply = totalSupply.add(total);
+
+        // Prevent to emit more than handcap!
+        assert(totalSupply <= HARDCAPPED_SUPPLY);
+    
         balances[_to] = balances[_to].add(_amount);
         balances[owner] = balances[owner].add(extra);
 
@@ -99,17 +96,6 @@ contract AceToken is StarTokenInterface, StandardToken, Ownable {
 
         return true;
     }
-
-    /**
-    * @dev Function to stop minting new tokens.
-    * @return True if the operation was successful.
-    */
-    function finishMinting() onlyOwner returns (bool) {
-        mintFinished = true;
-        MintFinished();
-        return true;
-    }
-
 
     function increaseApproval (address _spender, uint _addedValue) returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);

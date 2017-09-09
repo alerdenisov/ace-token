@@ -16,10 +16,10 @@ contract SimpleAceVoting {
 
     function voteFor(address _pretendent, uint256 _amount) returns (bool) {
         StarTokenInterface aceToken = StarTokenInterface(tokenAddress);
-        require(_pretendent != 0x0);
-        require(aceToken.allowance(msg.sender, this) >= _amount);
-        require(aceToken.transferFrom(msg.sender, this, _amount));
+        uint256 allowed = aceToken.allowance(msg.sender, address(this));
+        // require(allowed >= _amount);
 
-        voted[_pretendent] = voted[_pretendent].add(_amount);
+        // aceToken.transferFrom(msg.sender, _pretendent, _amount);
+        // voted[_pretendent] = voted[_pretendent].add(_amount);
     }
 }
