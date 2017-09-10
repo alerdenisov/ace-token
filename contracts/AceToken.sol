@@ -5,7 +5,6 @@ import './StarTokenInterface.sol';
 
 
 contract AceToken is StarTokenInterface {
-    using SafeMath for uint;
     using SafeMath for uint256;
     
     // ERC20 constants
@@ -17,15 +16,27 @@ contract AceToken is StarTokenInterface {
     uint256 public constant MAXSOLD_SUPPLY = 99000000;
     uint256 public constant HARDCAPPED_SUPPLY = 165000000;
     
+    // Transfer rules
     bool public transferAllowed = false;
     mapping (address=>bool) public specialAllowed;
 
+    // Transfer rules events
     event ToggleTransferAllowance(bool state);
     event ToggleTransferAllowanceFor(address indexed who, bool state);
 
+    /**
+    * @dev check transfer is allowed
+     */
     modifier allowTransfer() {
         require(transferAllowed || specialAllowed[msg.sender]);
         _;
+    }
+
+    /**
+    * @dev Doesn't allow to send funds on contract!
+     */
+    function () payable {
+        require(false);
     }
 
     /**
@@ -75,7 +86,7 @@ contract AceToken is StarTokenInterface {
     */
     function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
         require(_amount > 0);
-        
+
         // create 2 extra token for each 3 sold
         uint256 extra = _amount.div(3).mul(2);
         uint256 total = _amount.add(extra);
@@ -97,12 +108,22 @@ contract AceToken is StarTokenInterface {
         return true;
     }
 
+    /**
+    * @dev Increase approved amount to spend 
+    * @param _spender The address which will spend the funds.
+    * @param _addedValue The amount of tokens to increase already approved amount. 
+     */
     function increaseApproval (address _spender, uint _addedValue) returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
+    /**
+    * @dev Decrease approved amount to spend 
+    * @param _spender The address which will spend the funds.
+    * @param _subtractedValue The amount of tokens to decrease already approved amount. 
+     */
     function decreaseApproval (address _spender, uint _subtractedValue) returns (bool success) {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {

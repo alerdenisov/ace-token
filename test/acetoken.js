@@ -1,5 +1,15 @@
 const expectThrow = require('./utils').expectThrow
+const promisify = require('./utils').promisify
 const AceToken = artifacts.require("./AceToken.sol");
+
+
+function getBalance (account, at) {
+    return promisify(cb => web3.eth.getBalance(account, at, cb));
+}
+
+function sendTransaction(data) {
+    return promisify(cb => web3.eth.sendTransaction(data, cb));
+}
 
 let ACE
 
@@ -8,6 +18,25 @@ contract('AceToken', accounts => {
 
     beforeEach(async() => {
         ACE = await AceToken.new(OWNER_SIGNATURE)
+    })
+
+    describe('Payable', () => {
+        it('should forward received funds to the owner', async() => {
+            console.log(await getBalance(accounts[2]))
+            console.log(await getBalance(accounts[0]))
+
+            console.log(accounts[2])
+            console.log(ACE.address)
+
+            expectThrow(sendTransaction({
+                from: accounts[2], 
+                to: ACE.address, 
+                value: web3.toWei(0.2, "ether")
+            }))
+
+            console.log(await getBalance(accounts[2]))
+            console.log(await getBalance(accounts[0]))
+        })
     })
 
     describe('Ownership', () => {
