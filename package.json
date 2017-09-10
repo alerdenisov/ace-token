@@ -6,10 +6,11 @@
     "test": "test"
   },
   "dependencies": {
-    "sol-merger": "0.0.2",
     "zeppelin-solidity": "^1.2.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "sol-merger": "0.0.2"
+  },
   "scripts": {
     "merge": "sol-merger ./contracts/AceToken.sol ./build/contracts/AceToken.sol"
   },
