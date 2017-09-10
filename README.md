@@ -16,9 +16,9 @@ __Type:__ Once
 __Amount:__ Not more than *165,000,000* tokens
 
 __Distribution__ 
-__2/3__ – crowdsale investors 
-__1/6__ – team
-__1/6__ – community (rewards, bounty)
+__3/5__ – crowdsale investors 
+__1/5__ – team
+__1/5__ – community (rewards, bounty)
 
 ## Installation
 1. Install (if not yet) node and npm on your machine
