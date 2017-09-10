@@ -5,11 +5,14 @@ First of one token for Token Stars platform
 
 ### Details
 __Name:__ ACE Token
+
 __Ticker:__ ACE
+
 __Decimals:__ 0
 
 ### Emission
 __Type:__ Once
+
 __Amount:__ More more than 165,000,000 tokens
 
 __Distribution__ 
