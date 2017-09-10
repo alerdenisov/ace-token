@@ -13,7 +13,7 @@ __Decimals:__ 0
 ### Emission
 __Type:__ Once
 
-__Amount:__ More more than 165,000,000 tokens
+__Amount:__ Not more than *165,000,000* tokens
 
 __Distribution__ 
 __2/3__ – crowdsale investors 
