@@ -43,6 +43,9 @@ contract StarTokenInterface is MintableToken {
     // Custom methods and events
     function toggleTransfer() returns (bool);
     function toggleTransferFor(address _for) returns (bool);
+    function extraMint() returns (bool);
+    function currentOwner() constant public returns (address);
+
     event ToggleTransferAllowance(bool state);
     event ToggleTransferAllowanceFor(address indexed who, bool state);
 

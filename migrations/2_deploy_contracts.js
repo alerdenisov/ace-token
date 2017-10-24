@@ -1,8 +1,9 @@
 var AceToken = artifacts.require("./AceToken.sol");
-var SimpleAceVoting = artifacts.require("./SimpleAceVoting.sol");
+var AceTokenDistribution = artifacts.require('./AceTokenDistribution.sol');
 
 module.exports = function(deployer) {
-  deployer.deploy(AceToken).then(function() {
-    return deployer.deploy(SimpleAceVoting, AceToken.address);
-  })
+  deployer.deploy(AceToken, function(token) {
+    console.log(token)
+    deployer.deploy(AceTokenDistribution, token.address)
+  });
 };

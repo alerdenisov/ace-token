@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.15;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import './StarTokenInterface.sol';
@@ -37,7 +37,18 @@ contract AceToken is StarTokenInterface {
     // Minting constants
     uint256 public constant MAXSOLD_SUPPLY = 99000000;
     uint256 public constant HARDCAPPED_SUPPLY = 165000000;
-    
+
+    uint256 public investorSupply = 0;
+    uint256 public extraSupply = 0;
+    uint256 public freeToExtraMinting = 0;
+
+    uint256 public constant DISTRIBUTION_INVESTORS = 60;
+    uint256 public constant DISTRIBUTION_TEAM      = 20;
+    uint256 public constant DISTRIBUTION_COMMUNITY = 20;
+
+    address public teamTokensHolder;
+    address public communityTokensHolder;
+
     // Transfer rules
     bool public transferAllowed = false;
     mapping (address=>bool) public specialAllowed;
@@ -54,11 +65,28 @@ contract AceToken is StarTokenInterface {
         _;
     }
 
+    function AceToken(address _teamTokensHolder, address _communityTokensHolder) {
+      if(_teamTokensHolder == 0) {
+        _teamTokensHolder = msg.sender;
+      }
+
+      if(_communityTokensHolder == 0) {
+        _communityTokensHolder = msg.sender;
+      }
+
+      teamTokensHolder = _teamTokensHolder;
+      communityTokensHolder = _communityTokensHolder;
+    }
+
     /**
     * @dev Doesn't allow to send funds on contract!
      */
     function () payable {
         require(false);
+    }
+
+    function currentOwner() constant public returns (address) {
+      return owner;
     }
 
     /**
@@ -108,26 +136,43 @@ contract AceToken is StarTokenInterface {
     */
     function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
         require(_amount > 0);
+        totalSupply = totalSupply.add(_amount);
+        investorSupply = investorSupply.add(_amount);
+        freeToExtraMinting = freeToExtraMinting.add(_amount);
 
-        // create 2 extra token for each 3 sold
-        uint256 extra = _amount.div(3).mul(2);
-        uint256 total = _amount.add(extra);
-
-        totalSupply = totalSupply.add(total);
-
-        // Prevent to emit more than handcap!
+        // Prevent to emit more than sale hardcap!
+        assert(investorSupply <= MAXSOLD_SUPPLY);
         assert(totalSupply <= HARDCAPPED_SUPPLY);
-    
+
         balances[_to] = balances[_to].add(_amount);
-        balances[owner] = balances[owner].add(extra);
-
         Mint(_to, _amount);
-        Mint(owner, extra);
-
-        Transfer(0x0, _to, _amount);
-        Transfer(0x0, owner, extra);
-
         return true;
+    }
+
+    function extraMint() onlyOwner canMint returns (bool) {
+      require(freeToExtraMinting > 0);
+
+      uint256 onePercent = freeToExtraMinting / DISTRIBUTION_INVESTORS;
+      uint256 teamPart = onePercent * DISTRIBUTION_TEAM;
+      uint256 communityPart = onePercent * DISTRIBUTION_COMMUNITY;
+      uint256 extraTokens = teamPart.add(communityPart);
+
+      totalSupply = totalSupply.add(extraTokens);
+      extraSupply = extraSupply.add(extraTokens);
+
+      uint256 leftToNextMinting = freeToExtraMinting % DISTRIBUTION_INVESTORS;
+      freeToExtraMinting = leftToNextMinting;
+
+      assert(totalSupply <= HARDCAPPED_SUPPLY);
+      assert(extraSupply <= HARDCAPPED_SUPPLY.sub(MAXSOLD_SUPPLY));
+
+      balances[teamTokensHolder] = balances[teamTokensHolder].add(teamPart);
+      balances[communityTokensHolder] = balances[communityTokensHolder].add(communityPart);
+
+      Mint(teamTokensHolder, teamPart);
+      Mint(communityTokensHolder, communityPart);
+
+      return true;
     }
 
     /**
