@@ -1,7 +1,7 @@
 # ACE Token
 
 ## Abstract
-First of one token for Token Stars platform
+First of one token for TokenStars platform
 
 ### Details
 __Name:__ ACE Token

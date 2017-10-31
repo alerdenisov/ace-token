@@ -1,4 +1,4 @@
-// ACE Token is a first token of Token Stars platform
+// ACE Token is a first token of TokenStars platform
 // Copyright (c) 2017 TokenStars
 // Made by Aler Denisov
 // Permission is hereby granted, free of charge, to any person obtaining a copy
