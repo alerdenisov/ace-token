@@ -229,9 +229,8 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 // ACE Token is a first token of Token Stars platform
-
-// Copyright (c) 2017 Aler Denisov <aler.zampillo@gmail.com>
-
+// Copyright (c) 2017 TokenStars
+// Made by Aler Denisov
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -283,9 +282,8 @@ contract StarTokenInterface is MintableToken {
 }
 
 // ACE Token is a first token of Token Stars platform
-
-// Copyright (c) 2017 Aler Denisov <aler.zampillo@gmail.com>
-
+// Copyright (c) 2017 TokenStars
+// Made by Aler Denisov
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
