@@ -65,17 +65,21 @@ contract AceToken is StarTokenInterface {
         _;
     }
 
-    function AceToken(address _teamTokensHolder, address _communityTokensHolder) {
-      if(_teamTokensHolder == 0) {
-        _teamTokensHolder = msg.sender;
-      }
+    function AceToken() {
+      teamTokensHolder = msg.sender;
+      communityTokensHolder = msg.sender;
+    }
 
-      if(_communityTokensHolder == 0) {
-        _communityTokensHolder = msg.sender;
-      }
+    function setTeamTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
+      require(_tokenHolder != 0);
+      teamTokensHolder = _tokenHolder;
+      return true;
+    }
 
-      teamTokensHolder = _teamTokensHolder;
-      communityTokensHolder = _communityTokensHolder;
+    function setCommunityTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
+      require(_tokenHolder != 0);
+      communityTokensHolder = _tokenHolder;
+      return true;
     }
 
     /**
@@ -146,6 +150,7 @@ contract AceToken is StarTokenInterface {
 
         balances[_to] = balances[_to].add(_amount);
         Mint(_to, _amount);
+        Transfer(address(this), _to, _amount);
         return true;
     }
 
@@ -170,7 +175,9 @@ contract AceToken is StarTokenInterface {
       balances[communityTokensHolder] = balances[communityTokensHolder].add(communityPart);
 
       Mint(teamTokensHolder, teamPart);
+      Transfer(address(this), teamTokensHolder, teamPart);
       Mint(communityTokensHolder, communityPart);
+      Transfer(address(this), communityTokensHolder, communityPart);
 
       return true;
     }

@@ -12,7 +12,7 @@
     "sol-merger": "0.0.2"
   },
   "scripts": {
-    "merge": "sol-merger ./contracts/AceToken.sol ./build/contracts/AceToken.sol"
+    "merge": "sol-merger contracts\\AceToken.sol build\\contracts\\AceToken.sol && sol-merger contracts\\AceTokenDistribution.sol build\\contracts\\AceTokenDistribution.sol "
   },
   "repository": {
     "type": "git",

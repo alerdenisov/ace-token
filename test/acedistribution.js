@@ -12,7 +12,7 @@ contract('AceTokenDistribution', accounts => {
 
   beforeEach(async () => {
     ACE = await AceToken.new(accounts[1], accounts[2], OWNER_SIGNATURE)
-    DISTR = await AceTokenDistribution.new(ACE.address, accounts[0], OWNER_SIGNATURE)
+    DISTR = await AceTokenDistribution.new(ACE.address, OWNER_SIGNATURE)
   })
 
   describe('Initialization', async() => {
@@ -60,6 +60,19 @@ contract('AceTokenDistribution', accounts => {
       await DISTR.bulkMint([accounts[0], accounts[1]], [3000,3000], OWNER_SIGNATURE)
       await DISTR.extraMint(OWNER_SIGNATURE)
       assertSupply(10000)
+    })
+
+    it('should mint tokens for 50 accounts', async() => {
+      const count = 50
+      const recepeinets = []
+      const amounts = []
+      for(let index = 0; index < count; index++) {
+        recepeinets[index] = accounts[index % accounts.length]
+        amounts[index] = 1000
+      }
+
+      await DISTR.bulkMint(recepeinets, amounts, OWNER_SIGNATURE)
+      assertSupply(1000 * count)
     })
   })
 })
