@@ -63,7 +63,7 @@ contract AceToken is StarTokenInterface {
 
     /**
     * @dev check transfer is allowed
-     */
+    */
     modifier allowTransfer() {
         require(transferAllowed || specialAllowed[msg.sender]);
         _;
@@ -79,7 +79,8 @@ contract AceToken is StarTokenInterface {
 
     /**
     * @dev change team tokens holder
-     */
+    * @param _tokenHolder The address of next team tokens holder
+    */
     function setTeamTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
       require(_tokenHolder != 0);
       address temporaryEventAddress = teamTokensHolder;
@@ -90,7 +91,8 @@ contract AceToken is StarTokenInterface {
 
     /**
     * @dev change community tokens holder
-     */
+    * @param _tokenHolder The address of next community tokens holder
+    */
     function setCommunityTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
       require(_tokenHolder != 0);
       address temporaryEventAddress = communityTokensHolder;
@@ -101,7 +103,7 @@ contract AceToken is StarTokenInterface {
 
     /**
     * @dev Doesn't allow to send funds on contract!
-     */
+    */
     function () payable {
         require(false);
     }
