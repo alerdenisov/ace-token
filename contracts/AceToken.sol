@@ -72,8 +72,14 @@ contract AceToken is StarTokenInterface {
     function AceToken() {
       teamTokensHolder = msg.sender;
       communityTokensHolder = msg.sender;
+
+      ChangeTeamHolder(0x0, teamTokensHolder);
+      ChangeCommunityHolder(0x0, communityTokensHolder);
     }
 
+    /**
+    * @dev change team tokens holder
+     */
     function setTeamTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
       require(_tokenHolder != 0);
       address temporaryEventAddress = teamTokensHolder;
@@ -82,6 +88,9 @@ contract AceToken is StarTokenInterface {
       return true;
     }
 
+    /**
+    * @dev change community tokens holder
+     */
     function setCommunityTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
       require(_tokenHolder != 0);
       address temporaryEventAddress = communityTokensHolder;
