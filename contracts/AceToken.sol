@@ -57,6 +57,10 @@ contract AceToken is StarTokenInterface {
     event ToggleTransferAllowance(bool state);
     event ToggleTransferAllowanceFor(address indexed who, bool state);
 
+    // Holders events
+    event ChangeCommunityHolder(address indexed from, address indexed to);
+    event ChangeTeamHolder(address indexed from, address indexed to);
+
     /**
     * @dev check transfer is allowed
      */
@@ -72,13 +76,17 @@ contract AceToken is StarTokenInterface {
 
     function setTeamTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
       require(_tokenHolder != 0);
+      address temporaryEventAddress = teamTokensHolder;
       teamTokensHolder = _tokenHolder;
+      ChangeTeamHolder(temporaryEventAddress, teamTokensHolder);
       return true;
     }
 
     function setCommunityTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
       require(_tokenHolder != 0);
+      address temporaryEventAddress = communityTokensHolder;
       communityTokensHolder = _tokenHolder;
+      ChangeCommunityHolder(temporaryEventAddress, communityTokensHolder);
       return true;
     }
 
