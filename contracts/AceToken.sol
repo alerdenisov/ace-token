@@ -53,8 +53,8 @@ contract AceToken is StarTokenInterface {
     mapping (address=>bool) public specialAllowed;
 
     // Transfer rules events
-    event ToggleTransferAllowance(bool state);
-    event ToggleTransferAllowanceFor(address indexed who, bool state);
+    // event TransferAllowed();
+    // event TransferAllowanceFor(address indexed who, bool indexed state);
 
     // Holders events
     event ChangeCommunityHolder(address indexed from, address indexed to);
@@ -68,7 +68,7 @@ contract AceToken is StarTokenInterface {
         _;
     }
 
-    function AceToken() {
+    function AceToken() public {
       teamTokensHolder = msg.sender;
       communityTokensHolder = msg.sender;
 
@@ -80,7 +80,7 @@ contract AceToken is StarTokenInterface {
     * @dev change team tokens holder
     * @param _tokenHolder The address of next team tokens holder
     */
-    function setTeamTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
+    function setTeamTokensHolder(address _tokenHolder) onlyOwner public returns (bool) {
       require(_tokenHolder != 0);
       address temporaryEventAddress = teamTokensHolder;
       teamTokensHolder = _tokenHolder;
@@ -92,7 +92,7 @@ contract AceToken is StarTokenInterface {
     * @dev change community tokens holder
     * @param _tokenHolder The address of next community tokens holder
     */
-    function setCommunityTokensHolder(address _tokenHolder) onlyOwner returns (bool) {
+    function setCommunityTokensHolder(address _tokenHolder) onlyOwner public returns (bool) {
       require(_tokenHolder != 0);
       address temporaryEventAddress = communityTokensHolder;
       communityTokensHolder = _tokenHolder;
@@ -103,12 +103,8 @@ contract AceToken is StarTokenInterface {
     /**
     * @dev Doesn't allow to send funds on contract!
     */
-    function () payable {
+    function () payable public {
         require(false);
-    }
-
-    function currentOwner() constant public returns (address) {
-      return owner;
     }
 
     /**
@@ -116,7 +112,7 @@ contract AceToken is StarTokenInterface {
     * @param _to The address to transfer to.
     * @param _value The amount to be transferred.
     */
-    function transfer(address _to, uint256 _value) allowTransfer returns (bool) {
+    function transfer(address _to, uint256 _value) allowTransfer public returns (bool) {
         return super.transfer(_to, _value);
     }
 
@@ -127,26 +123,27 @@ contract AceToken is StarTokenInterface {
     * @param _to address The address which you want to transfer to
     * @param _value uint256 the amount of tokens to be transferred
      */
-    function transferFrom(address _from, address _to, uint256 _value) allowTransfer returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) allowTransfer public returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
 
     /**
-    * @dev Change current state of transfer allowence to opposite
+    * @dev Open transfer for everyone or throws
      */
-    function toggleTransfer() onlyOwner returns (bool) {
-        transferAllowed = !transferAllowed;
-        ToggleTransferAllowance(transferAllowed);
-        return transferAllowed;
+    function openTransfer() onlyOwner public returns (bool) {
+        require(!transferAllowed);
+        transferAllowed = true;
+        TransferAllowed();
+        return true;
     }
 
     /**
     * @dev allow transfer for the given address against global rules
     * @param _for addres The address of special allowed transfer (required for smart contracts)
      */
-    function toggleTransferFor(address _for) onlyOwner returns (bool) {
+    function toggleTransferFor(address _for) onlyOwner public returns (bool) {
         specialAllowed[_for] = !specialAllowed[_for];
-        ToggleTransferAllowanceFor(_for, specialAllowed[_for]);
+        TransferAllowanceFor(_for, specialAllowed[_for]);
         return specialAllowed[_for];
     }
 
@@ -156,7 +153,7 @@ contract AceToken is StarTokenInterface {
     * @param _amount The amount of tokens to emit.
     * @return A boolean that indicates if the operation was successful.
     */
-    function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
+    function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
         require(_amount > 0);
         totalSupply = totalSupply.add(_amount);
         investorSupply = investorSupply.add(_amount);
@@ -172,7 +169,11 @@ contract AceToken is StarTokenInterface {
         return true;
     }
 
-    function extraMint() onlyOwner canMint returns (bool) {
+
+    /**
+    * @dev Mint extra token to corresponding token and community holders
+    */
+    function extraMint() onlyOwner canMint public returns (bool) {
       require(freeToExtraMinting > 0);
 
       uint256 onePercent = freeToExtraMinting / DISTRIBUTION_INVESTORS;
@@ -205,7 +206,7 @@ contract AceToken is StarTokenInterface {
     * @param _spender The address which will spend the funds.
     * @param _addedValue The amount of tokens to increase already approved amount. 
      */
-    function increaseApproval (address _spender, uint _addedValue) returns (bool success) {
+    function increaseApproval (address _spender, uint _addedValue)  public returns (bool success) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
@@ -216,7 +217,7 @@ contract AceToken is StarTokenInterface {
     * @param _spender The address which will spend the funds.
     * @param _subtractedValue The amount of tokens to decrease already approved amount. 
      */
-    function decreaseApproval (address _spender, uint _subtractedValue) returns (bool success) {
+    function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -224,6 +225,15 @@ contract AceToken is StarTokenInterface {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        return true;
+    }
+
+
+    function finilize() onlyOwner public returns (bool) {
+        require(mintingFinished);
+        require(transferAllowed);
+
+        owner = 0x0;
         return true;
     }
 }

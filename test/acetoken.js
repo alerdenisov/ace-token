@@ -143,7 +143,7 @@ contract('AceToken', accounts => {
       })
 
       it('should allow to transfer funds', async () => {
-        await ACE.toggleTransfer(OWNER_SIGNATURE)
+        await ACE.openTransfer(OWNER_SIGNATURE)
         return ACE.transfer(accounts[1], 1000, OWNER_SIGNATURE)
       })
 
@@ -178,10 +178,37 @@ contract('AceToken', accounts => {
 
       it('should transfer tokens as always', async () => {
         await ACE.approve(accounts[2], 5000, { from: accounts[1] })
-        await ACE.toggleTransfer(OWNER_SIGNATURE)
+        await ACE.openTransfer(OWNER_SIGNATURE)
         await ACE.transferFrom(accounts[1], accounts[2], 5000, { from: accounts[2] })
         await assertBalance(accounts[1], 5000)
         await assertBalance(accounts[2], 7000)
+      })
+    })
+
+    describe('Finilize crowdsale', () => {
+      it('shouldnt to allow to finalize before end minting and/or open transfer', async() => {
+        await expectThrow(ACE.finilize(OWNER_SIGNATURE))
+      })
+      it('shouldnt to allow to finalize before open transfer', async() => {
+        await ACE.finishMinting(OWNER_SIGNATURE)
+        await expectThrow(ACE.finilize(OWNER_SIGNATURE))
+      })
+      it('shouldnt to allow to finalize before open transfer', async() => {
+        await ACE.openTransfer(OWNER_SIGNATURE)
+        await expectThrow(ACE.finilize(OWNER_SIGNATURE))
+      })
+      it('should finalize after ends minting and open transfer', async() => {
+        await ACE.openTransfer(OWNER_SIGNATURE)
+        await ACE.finishMinting(OWNER_SIGNATURE)
+        await ACE.finilize(OWNER_SIGNATURE)
+      })
+      it('owner should be a 0 after ends', async() => {
+        await ACE.openTransfer(OWNER_SIGNATURE)
+        await ACE.finishMinting(OWNER_SIGNATURE)
+        await ACE.finilize(OWNER_SIGNATURE)
+
+        const owner = await ACE.owner()
+        assert(!parseInt(owner), `unxpected owner address ${owner}`)
       })
     })
   })
